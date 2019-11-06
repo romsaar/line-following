@@ -48,6 +48,18 @@ def get_strong_lines(lines,rho_min_dist):
 
 def find_line(cap, out_file):
 
+    """A function used to find distinct lines in an images stream
+
+    Attributes:
+    ----------
+    cap -
+    rho_min_dist - the min dist between distinct lines
+
+    Output:
+    ------
+    strong_lines - a structure including up to 4 distinct lines
+    """
+
     while(cap.isOpened()):
 
         # Read next image from file
@@ -98,9 +110,24 @@ def find_line(cap, out_file):
 
                 strong_lines = get_strong_lines(lines,100)
                 for my_lines in strong_lines:
-                    print(my_lines)
-                #print(strong_lines)
-                #for rho, theta in strong_lines:
+                    rho = my_lines[0][0]
+                    theta = my_lines[0][1]
+                    if (rho==0) and (theta==0):
+                        break;
+                    else:
+                        print(rho, theta)
+                        a = np.cos(theta)
+                        b = np.sin(theta)
+                        x0 = a * rho
+                        y0 = b * rho
+                        x1 = int(x0 + 1000 * (-b))
+                        y1 = int(y0 + 1000 * (a))
+                        x2 = int(x0 - 1000 * (-b))
+                        y2 = int(y0 - 1000 * (a))
+
+                        cv2.line(normalizedFrame, (x1, y1), (x2, y2), (255, 0, 0), 2)
+
+                '''
                 for rho, theta in lines[0:N,0]:
                     a = np.cos(theta)
                     b = np.sin(theta)
@@ -111,8 +138,9 @@ def find_line(cap, out_file):
                     x2 = int(x0 - 1000 * (-b))
                     y2 = int(y0 - 1000 * (a))
                     print(rho, theta)
-
+                    
                     cv2.line(normalizedFrame, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                    '''
 
         out_file.write(normalizedFrame)
         cv2.imshow('frame', normalizedFrame)
