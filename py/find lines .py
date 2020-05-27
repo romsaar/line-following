@@ -1,8 +1,9 @@
+#!/usr/bin/env python
 import numpy as np
 import cv2
 
 Probabilistic = False
-
+is_camera=True
 def get_strong_lines(lines,rho_min_dist):
 
     """A function used to extract distinct lines from a HoughTransform lines list
@@ -46,7 +47,7 @@ def get_strong_lines(lines,rho_min_dist):
                     #print(lines[n1])
     return strong_lines
 
-def find_line(cap, out_file):
+def find_line(cap=None, frame=None, out_file=None):
 
     """A function used to find distinct lines in an images stream
 
@@ -60,11 +61,13 @@ def find_line(cap, out_file):
     strong_lines - a structure including up to 4 distinct lines
     """
 
-    while(cap.isOpened()):
-
+    while((cap !=None and cap.isOpened()) or frame!=None):
+        
         # Read next image from file
-        ret, frame = cap.read()
-
+        if cap!=None:
+            ret, frame = cap.read()
+        else:
+            ret=1;
         # If video file has ended -> break
         if not(ret):
             break
@@ -141,8 +144,8 @@ def find_line(cap, out_file):
                     
                     cv2.line(normalizedFrame, (x1, y1), (x2, y2), (255, 0, 0), 2)
                     '''
-
-        out_file.write(normalizedFrame)
+        if out_file !=None:
+            out_file.write(normalizedFrame)
         cv2.imshow('frame', normalizedFrame)
 
         if cv2.waitKey(5) & 0xFF == ord('q'):
@@ -156,14 +159,19 @@ def find_line(cap, out_file):
 
 def main():
     #cap = cv2.VideoCapture('deck vid.mp4')
-    cap = cv2.VideoCapture('gal deck.mp4')
+    if is_camera:
+        cap = cv2.VideoCapture('gals deck.mp4')
 
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
+        find_line(cap=cap, frame=None, out_file=out)
+    else:
+        frame = cv2.imread("../images/frame-1.png")
 
-    find_line(cap, out)
+        find_line(cap=None, frame=frame, out_file=None)
 
-    cap.release()
+    if is_camera:
+        cap.release()
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
