@@ -61,10 +61,12 @@ def find_line(cap=None, frame=None, out_file=None):
     strong_lines - a structure including up to 4 distinct lines
     """
 
-    while((cap !=None and cap.isOpened()) or frame!=None):
+    while(1):
         
         # Read next image from file
         if cap!=None:
+            if not cap.isOpened():
+                break;
             ret, frame = cap.read()
         else:
             ret=1;
